@@ -1,6 +1,7 @@
 var sub = "SXGWLZPDOKFIVUHJYTQBNMACERxswgzldpkoifuvjhtybqmncare";
-var nouns = ''; 
-var verb = '';
+var nouns1 = ''; 
+var nouns2 = '';
+var rand = '';
 var url = location.href;
 
 function encodeStr(uncoded) {
@@ -45,23 +46,18 @@ return results[1];
 $('.reload').click(getWords);
 
 function getWords() {
-  $.when(
-    $.ajax({
-      url: 'http://api.wordnik.com/v4/words.json/randomWords?minCorpusCount=10000&minDictionaryCount=5&excludePartOfSpeech=proper-noun,proper-noun-plural,proper-noun-posessive,suffix,family-name,idiom,affix&hasDictionaryDef=true&includePartOfSpeech=noun,adjective,verb&limit=3&maxLength=22&api_key='+key.API_KEY,
-      async: false,
-      dataType:"json"
-    }),
-    $.ajax({
-      url: 'http://api.wordnik.com//v4/words.json/randomWord?excludePartOfSpeech=adjective&hasDictionaryDef=true&includePartOfSpeech=verb-transitive&minCorpusCount=1000&api_key='+key.API_KEY,
-      async: false,
-      dataType:"json"
-    })
-  ).done(function(noun_data, verb_data) {
+  $.ajax({
+    url: 'http://api.wordnik.com/v4/words.json/randomWords?minCorpusCount=10000&minDictionaryCount=5&excludePartOfSpeech=proper-noun,proper-noun-plural,proper-noun-posessive,suffix,family-name,idiom,affix&hasDictionaryDef=true&includePartOfSpeech=noun,adjective,verb&limit=2&maxLength=22&api_key='+key.API_KEY,
+    async: false,
+    dataType:"json"
+  }).done(function(noun_data) {
     $('#allthethings').html('');
-    nouns = noun_data[0][0].word.pluralize();
-    var verb = verb_data[0].word;
-    $("#allthethings").append(verb + " ALL the " + nouns + "<br>");
-    $('#share').attr('href',location.href.split('?')[0]+'?word='+encodeStr(verb)+'$'+encodeStr(nouns));
+    nouns1 = noun_data[0].word;
+    nouns2 = noun_data[1].word.pluralize();
+    var scale = Math.ceil(Math.log(Math.pow(1000, Math.pow(Math.random(), 2))) / Math.LN10);
+    rand = (Math.floor(Math.random() * 10000) * Math.pow(10, scale - 4)).toString().substr(0,5);
+    $("#allthethings").append("1 " + nouns1 + " = " + rand + " " + nouns2 + "<br>");
+    $('#share').attr('href',location.href.split('?')[0]+'?word='+encodeStr(nouns1)+'$'+encodeStr(rand)+'$'+encodeStr(nouns2));
   });
   return false;
 }
@@ -71,10 +67,11 @@ if (gup('word') === "") {
   $('.reload').attr('href',location.origin+location.pathname);
 }
 else {
-  verb = decodeStr(unescape(gup('word')).split('$')[0]);
-  nouns = decodeStr(unescape(gup('word')).split('$')[1]);
+  nouns1 = decodeStr(unescape(gup('word')).split('$')[0]);
+  rand =  decodeStr(unescape(gup('word')).split('$')[1]);
+  nouns2 = decodeStr(unescape(gup('word')).split('$')[2]);
   $('#allthethings').text('');
-  $("#allthethings").append(verb + " ALL the " + nouns + "<br>");
+  $("#allthethings").append("1 " + nouns1 + " = " + rand + " " + nouns2 + "<br>");
   $('.reload').attr('href',location.origin+location.pathname);
   $('#share').attr('href',url);
 }
